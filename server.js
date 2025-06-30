@@ -57,3 +57,36 @@ server.on('upgrade', (request, socket, head) => {
 server.listen(port, () => {
     console.log(`🚀 Server running on http://localhost:${port}`);
 });
+
+// Webhook endpoint for LINE messages
+app.post('/webhook', async (req, res) => {
+    const events = req.body.events;
+
+    if (!Array.isArray(events)) {
+        return res.sendStatus(400);
+    }
+
+    for (const event of events) {
+        // Only handle text messages
+        if (event.type === 'message' && event.message.type === 'text') {
+            const replyText = event.message.text.trim();
+
+            // Extract visitor ID from message (e.g., @visitor-1234 ...)
+            const match = replyText.match(/^@visitor-([a-z0-9]+)\s+(.*)/i);
+            if (match) {
+                const visitorId = `visitor-${match[1]}`;
+                const messageToSend = match[2];
+
+                const visitorSocket = clients.get(visitorId);
+                if (visitorSocket && visitorSocket.readyState === 1) {
+                    visitorSocket.send(`🟢 From Luis: @${visitorId} ${messageToSend}`);
+                    console.log(`🔁 Replied to ${visitorId}: ${messageToSend}`);
+                } else {
+                    console.warn(`⚠️ Visitor ${visitorId} not connected.`);
+                }
+            }
+        }
+    }
+
+    res.sendStatus(200);
+});
