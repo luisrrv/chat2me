@@ -38,7 +38,7 @@
     <script>
         const visitorId = 'visitor-' + Math.random().toString(36).slice(2, 6);
         // const socket = new WebSocket(`ws://${location.host}?visitorId=${visitorId}`);
-        const socket = new WebSocket("wss://chat2me-backend.onrender.com?visitorId=visitor-xxxx");
+        const socket = new WebSocket(`wss://chat2me-backend.onrender.com?visitorId=${visitorId}`);
 
         socket.onmessage = (event) => {
             const el = document.createElement('li');
