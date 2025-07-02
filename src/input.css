@@ -4,11 +4,15 @@
 
 /* Custom base styles */
 @layer base {
-    body {
-        background: url('./assets/bg.jpg');
-        background-repeat: no-repeat;
-        background-position: center center;
+    html {
+        background: url('./assets/bg.jpg') no-repeat center center fixed;
         background-size: cover;
+        background-color: #0a0e1a;
+    }
+
+    body {
+        background: transparent !important;
+        background-color: transparent !important;
     }
 }
 
