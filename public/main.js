@@ -19,10 +19,21 @@ function appendMessage(text, senderId, isSelf = false) {
 
     li.appendChild(bubble);
 
+    const labelWrapper = document.createElement('div');
+    labelWrapper.className = 'label-wrapper';
+
+    if (!isSelf) {
+        const icon = document.createElement('div');
+        icon.className = 'luis-icon';
+        labelWrapper.appendChild(icon);
+    }
+
     const label = document.createElement('div');
     label.textContent = isSelf ? `You (${senderId})` : senderId;
     label.className = "label text-xs text-gray-400 select-none";
-    li.appendChild(label);
+    labelWrapper.appendChild(label);
+
+    li.appendChild(labelWrapper);
 
     chatLogEl.appendChild(li);
     chatLogEl.scrollTop = chatLogEl.scrollHeight;
