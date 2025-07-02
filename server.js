@@ -84,6 +84,16 @@ app.post('/webhook', async (req, res) => {
                 } else {
                     console.warn(`⚠️ Visitor ${visitorId} not connected.`);
                 }
+            } else {
+                const messageToSend = replyText;
+
+                const visitorSocket = clients.get(visitorId);
+                if (visitorSocket && visitorSocket.readyState === 1) {
+                    visitorSocket.send(`Luis: ${messageToSend}`);
+                    console.log(`🔁 Replied generally: ${messageToSend}`);
+                } else {
+                    console.warn(`⚠️ Visitor ${visitorId} not connected.`);
+                }
             }
         }
     }

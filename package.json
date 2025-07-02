@@ -4,9 +4,10 @@
   "description": "# 💬 Public Web Chat → LINE Messaging API with Real-Time Replies",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon server.js",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css",
     "watch:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch",
-    "build": "npx tailwindcss -i ./src/input.css -o ./public/styles.css",
+    "build": "tailwindcss -i ./src/input.css -o ./public/styles.css",
     "start": "node server.js"
   },
   "keywords": [],
@@ -17,13 +18,13 @@
     "body-parser": "^2.2.0",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
-    "ws": "^8.18.3",
-    "tailwindcss": "^3.4.17"
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "nodemon": "^3.1.10",
-    "postcss": "^8.5.6"
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
   },
   "directories": {
     "lib": "lib"
