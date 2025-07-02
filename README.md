@@ -7,7 +7,6 @@
 This project enables a **public-facing web chat** where anonymous visitors can send me messages. These messages are:
 
 - 🔁 Forwarded to my **LINE account** using the LINE Messaging API
-- 🚨 Trigger a LINE Notify alert so I never miss a message
 - 💬 When I reply from LINE, my reply is routed back in **real-time** to the correct visitor via WebSocket
 
 All this happens while keeping my LINE private, maintaining user anonymity, and preventing spam.
@@ -19,7 +18,6 @@ All this happens while keeping my LINE private, maintaining user anonymity, and 
 - Public chat widget for anonymous visitors (no LINE login required)
 - Messages are pushed to my personal LINE via Messaging API
 - Replies from my LINE app are pushed back to the visitor’s browser
-- LINE Notify alerts me of new messages instantly
 - Real-time WebSocket communication (no polling)
 - Minimal in-memory message storage: only the **last 10 messages per visitor**
 - Modern lightweight frontend UI with Tailwind CSS (iOS/macOS look)
@@ -41,17 +39,16 @@ All this happens while keeping my LINE private, maintaining user anonymity, and 
 ## 🧱 Architecture
 
 ```
-[ Visitor Browser ] <-- WebSocket -->
-[ Node.js Backend ]
-        |             ↑
-        |             | Webhook
-        ↓             |
-[ LINE Messaging API ] ← LINE Replies
-        |
-        ↓
-[ My LINE Account ]
-
-[ LINE Notify API ] ← Alerts on new visitor messages
+[ Visitor Browser ] <-- WebSocket --> [ Node.js Backend ]
+                                          ↑
+                                          |
+                                      Webhook (POST)
+                                          |
+                                          ↓
+                            [ LINE Messaging API ] ← LINE Replies
+                                          ↑
+                                          |
+                              [ My LINE Account (Luis) ]
 ```
 
 ---
@@ -70,14 +67,12 @@ All this happens while keeping my LINE private, maintaining user anonymity, and 
 - In-memory store for last 10 messages per visitor
 - LINE Messaging API integration (push messages)
 - LINE webhook endpoint (handle replies)
-- LINE Notify integration for alerting
 - Rate limiting and validation logic
 - All LINE tokens and secrets are stored in environment variables for privacy (not committed to GitHub)
 
 ### 🔸 LINE APIs Used
 
 - **Messaging API** — Sends messages to my LINE account; receives replies via webhook
-- **Notify API** — Sends me LINE alerts on message receipt
 
 ---
 
@@ -102,12 +97,5 @@ All this happens while keeping my LINE private, maintaining user anonymity, and 
 - Messages are never stored permanently (in-memory buffer only)
 - Replies are only routed to intended recipients using visitor ID tagging
 - No LINE accounts are exposed publicly
-- All LINE credentials are kept in private `.env` files and never committed to version control
 
 ---
-
-``` 
-npm run build:css
-```
-
--
