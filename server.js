@@ -79,7 +79,7 @@ app.post('/webhook', async (req, res) => {
 
                 const visitorSocket = clients.get(visitorId);
                 if (visitorSocket && visitorSocket.readyState === 1) {
-                    visitorSocket.send(`🟢 From Luis: @${visitorId} ${messageToSend}`);
+                    visitorSocket.send(`Luis: @${visitorId} ${messageToSend}`);
                     console.log(`🔁 Replied to ${visitorId}: ${messageToSend}`);
                 } else {
                     console.warn(`⚠️ Visitor ${visitorId} not connected.`);

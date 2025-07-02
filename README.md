@@ -106,17 +106,8 @@ All this happens while keeping my LINE private, maintaining user anonymity, and 
 
 ---
 
-## 🛠️ Setup Instructions (Coming Soon)
-
-This section will include:
-
-- Instructions to run the WebSocket + webhook backend
-- LINE channel setup (Messaging API + Notify)
-- Environment variable configuration
-- Deployment and security tips
-
----
-
-## 📦 TODO
+``` 
+npm run build:css
+```
 
 -
