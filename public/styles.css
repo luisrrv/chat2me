@@ -640,7 +640,7 @@ body {
   border-radius: 12rem;
   padding: 0.7rem 1rem;
   color: #e5e7eb;
-  font-size: 0.9rem;
+  font-size: 16px !important;
   outline: none;
 }
 
@@ -667,7 +667,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 16px !important;
 }
 
 .floating-input-bar button:hover {
