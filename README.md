@@ -6,7 +6,7 @@ A public-facing web chat that bridges anonymous visitors to my private LINE acco
 
 ![Chat2Me screenshot](docs/screenshot.png)
 
-**Live:** [https://anon2me.netlify.app]  ·  **Stack:** Node.js · Express · `ws` · LINE Messaging API · Netlify (frontend) · Render (backend)
+**Live:** [anon2me.netlify.app](https://anon2me.netlify.app)  ·  **Stack:** Node.js · Express · `ws` · LINE Messaging API · Netlify (frontend) · Render (backend)
 
 ---
 
