@@ -60,36 +60,34 @@ server.listen(port, () => {
 
 // Webhook endpoint for LINE messages
 app.post('/webhook', async (req, res) => {
-    const events = req.body.events;
+	const events = req.body.events;
 
-    if (!Array.isArray(events)) {
-        return res.sendStatus(400);
-    }
+	if (!Array.isArray(events)) {
+		return res.sendStatus(400);
+	}
 
-    for (const event of events) {
-        // Only handle text messages
-        if (event.type === 'message' && event.message.type === 'text') {
-            const replyText = event.message.text.trim();
+	for (const event of events) {
+		if (event.type !== 'message' || event.message.type !== 'text') continue;
 
-            // Extract visitor ID from message (e.g., @visitor-1234 ...)
-            const match = replyText.match(/^@visitor-([a-z0-9]+)\s+(.*)/i);
-            if (match) {
-                const visitorId = `visitor-${match[1]}`;
-                const messageToSend = match[2];
+		const replyText = event.message.text.trim();
+		const match = replyText.match(/^@visitor-([a-z0-9]+)\s+(.*)/i);
 
-                const visitorSocket = clients.get(visitorId);
-                if (visitorSocket && visitorSocket.readyState === 1) {
-                    visitorSocket.send(`Luis: @${visitorId} ${messageToSend}`);
-                    console.log(`🔁 Replied to ${visitorId}: ${messageToSend}`);
-                } else {
-                    console.warn(`⚠️ Visitor ${visitorId} not connected.`);
-                }
-            } else {
-                visitorSocket.send(`Luis: ${messageToSend}`);
-                console.log(`🔁 Replied generally: ${messageToSend}`);
-            }
-        }
-    }
+		if (!match) {
+			console.warn(`⚠️ Reply has no @visitor- prefix; ignoring: "${replyText}"`);
+			continue;
+		}
 
-    res.sendStatus(200);
+		const visitorId = `visitor-${match[1]}`;
+		const messageToSend = match[2];
+		const visitorSocket = clients.get(visitorId);
+
+		if (visitorSocket && visitorSocket.readyState === 1) {
+			visitorSocket.send(`Luis: @${visitorId} ${messageToSend}`);
+			console.log(`🔁 Replied to ${visitorId}: ${messageToSend}`);
+		} else {
+			console.warn(`⚠️ Visitor ${visitorId} not connected; reply dropped.`);
+		}
+	}
+
+	res.sendStatus(200);
 });
