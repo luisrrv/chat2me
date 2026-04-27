@@ -6,7 +6,7 @@ A public-facing web chat that bridges anonymous visitors to my private LINE acco
 
 ![Chat2Me screenshot](docs/screenshot.png)
 
-**Live:** [link]  ·  **Stack:** Node.js · Express · `ws` · LINE Messaging API · Netlify (frontend) · Render (backend)
+**Live:** [https://anon2me.netlify.app]  ·  **Stack:** Node.js · Express · `ws` · LINE Messaging API · Netlify (frontend) · Render (backend)
 
 ---
 
@@ -50,17 +50,39 @@ Each of these is an explicit tradeoff for the constraints above. Longer write-up
 
 ## Performance
 
-Tested locally on a [MacBook Pro M2, 16GB] with the LINE forward call mocked (`LOAD_TEST=1`) and the visitor send-rate set to one message every 6s to respect the frontend cooldown.
+Tested locally on a MacBook Pro (M-series, 16GB RAM) with the LINE forward call mocked
+(`LOAD_TEST=1`) and a per-visitor send rate of one message every 6s — matching the
+frontend's 5s cooldown.
+
+### Test profile
+
+Ramp from 0 → 1,000 concurrent WebSocket connections over 2.5 minutes, hold at 1,000 for
+2 minutes, ramp down. Total ~5 minutes. 3,850 visitor sessions, ~35k messages exchanged.
+
+### Results
 
 | Metric | Value |
 |---|---|
-| Peak concurrent WS connections (no errors) | [N] |
-| Ack round-trip p50 / p95 / p99 | [X / Y / Z] ms |
-| Throughput at peak | [N] msg/s |
-| Peak RSS at peak load | [N] MB |
-| First failure mode beyond peak | [Connection refused / event loop saturation / etc.] |
+| Peak concurrent WS connections | **1,000** (sustained 2 min) |
+| Connection errors | **0** out of 3,850 sessions |
+| Ack round-trip latency — p50 / p95 / p99 | **1ms / 2ms / 3ms** |
+| Ack round-trip latency — max | 65ms (single GC pause) |
+| WS handshake — p95 | 3.3ms |
+| Messages throughput at peak | 113 msg/s |
+| Peak RSS at 1,000 connections | **72 MB** (~50KB / connection) |
+| Heap behavior | Stable; no leak signature |
 
-The deployed Render free tier instance is significantly smaller than the test box. In production, expect it to tap out well below the local numbers above; the relevant scaling fix is in [ADR-0002](docs/decisions/0002-in-memory-state.md).
+### What this means
+
+The 1,000-connection ceiling is the **test ceiling, not the server ceiling** — server-side
+metrics showed significant headroom (heap stable, RSS growing ~linearly with connections).
+A higher cap would be needed to find the actual breaking point. For the use case described
+in [Why this exists](#why-this-exists), 1,000 concurrent is already three orders of
+magnitude above realistic load.
+
+The deployed Render free tier has substantially less RAM and CPU than the test box, so
+production capacity is bounded by the host, not the application. The relevant scaling
+path is in [ADR-0002](docs/decisions/0002-in-memory-state.md).
 
 ## Limitations
 

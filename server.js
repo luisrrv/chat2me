@@ -15,6 +15,18 @@ const { sendToLine } = require('./lib/line');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
+// Process metrics — used during load testing and useful in production
+app.get('/metrics', (req, res) => {
+  const m = process.memoryUsage();
+  res.json({
+    rss_mb: Math.round(m.rss / 1024 / 1024),
+    heap_used_mb: Math.round(m.heapUsed / 1024 / 1024),
+    heap_total_mb: Math.round(m.heapTotal / 1024 / 1024),
+    active_connections: clients.size,
+    uptime_s: Math.round(process.uptime()),
+  });
+});
+
 // In-memory visitor connections
 const clients = new Map(); // visitorId => WebSocket
 
@@ -25,12 +37,23 @@ wss.on('connection', (ws, request, visitorId) => {
     clients.set(visitorId, ws);
     console.log(`✅ Connected: ${visitorId}`);
 
-    ws.on('message', async (msg) => {
-        const messageText = msg.toString();
-        console.log(`📩 Message from ${visitorId}: ${messageText}`);
+	ws.on('message', async (msg) => {
+		const messageText = msg.toString();
 
-        await sendToLine(visitorId, messageText);
-    });
+		// Load-test path: echo ack with original timestamp for RTT measurement
+		if (process.env.LOAD_TEST === '1') {
+			try {
+				const parsed = JSON.parse(messageText);
+				if (parsed && parsed._t) {
+					ws.send(JSON.stringify({ type: 'ack', _t: parsed._t }));
+					return;
+				}
+			} catch (_) { /* not JSON — fall through to normal handling */ }
+		}
+
+		console.log(`📩 Message from ${visitorId}: ${messageText}`);
+		await sendToLine(visitorId, messageText);
+	});
 
     ws.on('close', () => {
         clients.delete(visitorId);
