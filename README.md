@@ -8,6 +8,8 @@ A public-facing web chat that bridges anonymous visitors to my private LINE acco
 
 **Live:** [anon2me.netlify.app](https://anon2me.netlify.app)  ·  **Stack:** Node.js · Express · `ws` · LINE Messaging API · Netlify (frontend) · Render (backend)
 
+> **Note:** backend hosted on Render's free tier — first request after idle may take ~30s to wake.
+
 ---
 
 ## Why this exists
